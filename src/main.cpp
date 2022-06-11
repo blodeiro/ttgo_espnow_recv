@@ -91,6 +91,7 @@ void setup() {
   }
   setup_lora_board();
   setup_wifi();
+  runserver();
 }
 
 void loop() {
