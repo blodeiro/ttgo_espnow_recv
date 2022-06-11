@@ -96,7 +96,7 @@ void setup() {
 void loop() {
   if (dato_novo)
   {
-    lora_send();
+    //lora_send(); //TODO: Check WDT reset
     update_display();
     dato_novo = false;
   }
