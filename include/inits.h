@@ -46,6 +46,8 @@ void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
   display.setCursor(0, 0);
   display.println("Connected: ");
   display.println(WiFi.localIP());
+  display.print("Wi-Fi Channel: ");
+  display.println(WiFi.channel());
   display.display();
   delay(5000);
 }
@@ -122,15 +124,6 @@ void setup_wifi()
 
   // Set device as a Wi-Fi Station
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Setting as a Wi-Fi Station..");
-  }
-
-  Serial.print("Station IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Wi-Fi Channel: ");
-  Serial.println(WiFi.channel());
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
