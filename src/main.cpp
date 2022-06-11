@@ -90,7 +90,7 @@ void setup() {
     Serial.println("Frecuencia normal");
   }
   setup_lora_board();
-  setup_espnow();
+  setup_wifi();
 }
 
 void loop() {

@@ -1,3 +1,6 @@
+// Replace with your network credentials (STATION)
+const char* ssid = "SMC extedida";
+const char* password = "";
 
 //define the pins used by the LoRa transceiver module
 #define SCK 5
