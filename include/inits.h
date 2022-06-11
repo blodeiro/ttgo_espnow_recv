@@ -38,16 +38,31 @@ void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info){
 
 void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
   Serial.println("WiFi connected");
-  Serial.print("WiFi lost connection. Reason: ");
-  Serial.println(info.wifi_sta_disconnected.reason);
+  Serial.print("Wi-Fi Channel: ");
+  Serial.println(WiFi.channel());
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Connected: ");
+  display.println(WiFi.localIP());
+  display.display();
+  delay(5000);
 }
 
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  static int retry = 0;
   Serial.println("Disconnected from WiFi access point");
+  Serial.print("WiFi lost connection. Reason: ");
+  Serial.println(info.wifi_sta_disconnected.reason);
   Serial.print("WiFi lost connection. Trying to reconnect: ");
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("Reconecting to WiFi: ");
+  display.println(retry);
+  display.display();
   WiFi.begin(ssid, password);
+  retry++;
 }
 
 void setup_lora_board()
