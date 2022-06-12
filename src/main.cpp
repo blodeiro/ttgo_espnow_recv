@@ -77,6 +77,21 @@ void update_display()
   counter ++;
 }
 
+void update_server()
+{
+  static int counter = 0;
+  board["board_id"] = beehiveSample.board_id;
+  board["temp_ext"] = beehiveSample.temp_ext;
+  board["hum_ext"] = beehiveSample.hum_ext;
+  board["temp_in"] = beehiveSample.temp_1;
+  board["hum_in"] = beehiveSample.hum_1;
+  board["press"] = beehiveSample.pres_2;
+  board["readingId"] = String(counter);
+  String jsonString = JSON.stringify(board);
+  events.send(jsonString.c_str(), "new_readings", millis());
+  counter++;
+}
+
 
 void setup() {
   // Initialize Serial Monitor
@@ -99,6 +114,7 @@ void loop() {
   {
     //lora_send(); //TODO: Check WDT reset
     update_display();
+    update_server();
     dato_novo = false;
   }
 }
