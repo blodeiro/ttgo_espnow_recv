@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>COLMENA HORREO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="icon" href="data:,">
+    <style>
+        html {
+            font-family: Arial;
+            display: inline-block;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.2rem;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #2f4468;
+            color: white;
+            font-size: 1.7rem;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            background-color: white;
+            box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, .5);
+        }
+
+        .cards {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .reading {
+            font-size: 2.8rem;
+        }
+
+        .packet {
+            color: #6c6c6c;
+        }
+
+        .card.temperature {
+            color: #fd7e14;
+        }
+
+        .card.humidity {
+            color: #1b78e2;
+        }
+
+        .card.pressure {
+            color: #e21b1b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav">
+        <h3>COLMENA HORREO</h3>
+    </div>
+    <div>
+        <p class="packet">Lectura: <span id="rs1"></span></p>
+    </div>
+    <div class="content">
+        <div class="cards">
+            <div class="card temperature">
+                <h4><i class="fas fa-thermometer-half"></i> TEMPERATURA EXTERIOR</h4>
+                <p><span class="reading"><span id="t_ext1"></span> &deg;C</span></p>
+            </div>
+            <div class="card humidity">
+                <h4><i class="fas fa-tint"></i> HUMIDADE EXTERIOR</h4>
+                <p><span class="reading"><span id="h_ext1"></span> &percnt;</span></p>
+            </div>
+            <div class="card temperature">
+                <h4><i class="fas fa-thermometer-half"></i> TEMPERATURA INTERIOR</h4>
+                <p><span class="reading"><span id="t_in1"></span> &deg;C</span></p>
+            </div>
+            <div class="card humidity">
+                <h4><i class="fas fa-tint"></i> HUMIDADE INTERIOR</h4>
+                <p><span class="reading"><span id="h_in1"></span> &percnt;</span></p>
+            </div>
+            <div class="card pressure">
+                <h4><i class="fas fa-cloud"></i> PRESION</h4>
+                <p><span class="reading"><span id="press1"></span> mBar</span></p>
+            </div>
+        </div>
+    </div>
+    <div id="chart-pressure" class="container"></div>
+    <div id="chart-temperature" class="container"></div>
+    <script>
+
+        var chartP = new Highcharts.Chart({
+            chart: { renderTo: 'chart-pressure' },
+            title: { text: 'Presion' },
+            series: [{
+                showInLegend: false,
+                data: []
+            }],
+            plotOptions: {
+                line: {
+                    animation: false,
+                    dataLabels: { enabled: true }
+                },
+                series: { color: '#18009c' }
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { second: '%H:%M:%S' }
+            },
+            yAxis: {
+                title: { text: 'Pressure (hPa)' }
+            },
+            credits: { enabled: false }
+        });
+
+        var chartT = new Highcharts.Chart({
+            chart: { renderTo: 'chart-temperature' },
+            title: { text: 'Temperaturas' },
+            series: [{
+                name: "Exterior",
+                showInLegend: true,
+                data: [],
+                lineColor: 'red',
+                marker: {
+                fillColor: 'red'
+                },
+            },
+            {
+                name: "Interior",
+                showInLegend: true,
+                data: [],
+                lineColor: 'green',
+                marker: {
+                fillColor: 'green'
+                },
+            }],
+            plotOptions: {
+                line: {
+                    animation: false,
+                    dataLabels: { enabled: true }
+                }
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { second: '%H:%M:%S' }
+            },
+            yAxis: {
+                title: { text: 'Temperatura (C)' }
+            },
+            credits: { enabled: false }
+        });
+
+        if (!!window.EventSource) {
+            var source = new EventSource('/events');
+
+            source.addEventListener('open', function (e) {
+                console.log("Events Connected");
+            }, false);
+            source.addEventListener('error', function (e) {
+                if (e.target.readyState != EventSource.OPEN) {
+                    console.log("Events Disconnected");
+                }
+            }, false);
+
+            source.addEventListener('message', function (e) {
+                console.log("message", e.data);
+            }, false);
+
+            source.addEventListener('new_readings', function (e) {
+                console.log("new_readings", e.data);
+                var obj = JSON.parse(e.data);
+                document.getElementById("t_ext" + obj.board_id).innerHTML = obj.temp_ext.toFixed(2);
+                document.getElementById("h_ext" + obj.board_id).innerHTML = obj.hum_ext.toFixed(2);
+                document.getElementById("t_in" + obj.board_id).innerHTML = obj.temp_in.toFixed(2);
+                document.getElementById("h_in" + obj.board_id).innerHTML = obj.hum_in.toFixed(2);
+                document.getElementById("press" + obj.board_id).innerHTML = obj.press.toFixed(2);
+                document.getElementById("rs" + obj.board_id).innerHTML = obj.readingId;
+                var x = (new Date()).getTime(),
+                    y = parseFloat(obj.press.toFixed(2));
+                if (chartP.series[0].data.length > 40) {
+                    chartP.series[0].addPoint([x, y], true, true, true);
+                } else {
+                    chartP.series[0].addPoint([x, y], true, false, true);
+                }
+                y = parseFloat(obj.temp_ext.toFixed(2));
+                if (chartT.series[0].data.length > 40) {
+                    chartT.series[0].addPoint([x, y], true, true, true);
+                } else {
+                    chartT.series[0].addPoint([x, y], true, false, true);
+                }
+                y = parseFloat(obj.temp_in.toFixed(2));
+                if (chartT.series[1].data.length > 40) {
+                    chartT.series[1].addPoint([x, y], true, true, true);
+                } else {
+                    chartT.series[1].addPoint([x, y], true, false, true);
+                }
+            }, false);
+        }
+    </script>
+</body>
+
+</html>
