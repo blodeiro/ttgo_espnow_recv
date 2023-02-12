@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "inits.h"
+#include "mqtt.h"
 
 
 void lora_send()
@@ -107,6 +108,7 @@ void setup() {
   setup_lora_board();
   setup_wifi();
   runserver();
+  setup_mqtt();
 }
 
 void loop() {
@@ -117,4 +119,5 @@ void loop() {
     update_server();
     dato_novo = false;
   }
+  loop_mqtt();
 }

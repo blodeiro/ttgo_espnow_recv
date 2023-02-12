@@ -10,6 +10,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+#include "secrets.h"
 #include "config.h"
 #include "webserver.h"
 

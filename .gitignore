@@ -1,2 +1,6 @@
 .pio/
 .vscode/
+docs/
+!docs/index.html
+data/
+include/secrets.h
